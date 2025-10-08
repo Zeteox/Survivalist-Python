@@ -22,7 +22,9 @@ class Player:
     def get_action_done(self) -> bool:
         return self.action_done
 
-    def get_alive(self) -> bool:
+    def is_alive(self) -> bool:
+        if self.get_energy() == 0 or self.get_hunger() == 100 or self.get_thirst() == 100:
+            self.set_alive(False)
         return self.alive
 
     def set_name(self, name: str) -> None:
@@ -51,4 +53,59 @@ class Player:
             'energy': self.energy
         }
 
+    def fishing(self):
+        if self.get_hunger() >= 10:
+            self.set_hunger(self.get_hunger() - 10)
+        else:
+            self.set_hunger(0)
+        if self.get_energy() >= 10:
+            self.set_energy(self.get_energy() - 10)
+        else:
+            self.set_energy(0)
+            self.set_alive(False)
 
+    def find_water(self):
+        if self.get_thirst() >= 10:
+            self.set_thirst(self.get_thirst() - 10)
+        else:
+            self.set_thirst(0)
+        if self.get_energy() >= 10:
+            self.set_energy(self.get_energy() - 10)
+        else:
+            self.set_energy(0)
+            self.set_alive(False)
+
+    def sleeping(self):
+        if self.get_hunger() <= 90:
+            self.set_hunger(self.get_hunger() + 10)
+        else:
+            self.set_hunger(100)
+            self.set_alive(False)
+        if self.get_thirst() <= 90:
+            self.set_thirst(self.get_thirst() + 10)
+        else:
+            self.set_thirst(100)
+            self.set_alive(False)
+        if self.get_energy() <= 90:
+            self.set_energy(self.get_energy() + 10)
+        else:
+            self.set_energy(100)
+
+    def do_action(self) -> None:
+        if self.action_done:
+            raise Exception("Action already done")
+        else:
+            print("What is your next action? (Fishing | Find water | Sleeping | Explore)")
+            choice = input('Action: ').lower().strip()
+            match choice:
+                case "fishing":
+                    self.fishing()
+                case "find water":
+                    self.find_water()
+                case "sleeping":
+                    self.sleeping()
+                case "explore":
+                    print('you have explore the forest')
+                case _:
+                    self.do_action()
+            self.set_action_done(True)
