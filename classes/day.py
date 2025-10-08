@@ -1,8 +1,9 @@
-from classes.Events import get_random_event
+from events import get_random_event
 
 
 class Day:
-    event=get_random_event()
+    def __init__(self):
+        self.event = get_random_event()
 
     def get_event(self):
         return self.event
