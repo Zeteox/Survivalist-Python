@@ -74,31 +74,63 @@ class Game:
         self.next_day()
         self.cli_game_loop()
 
+    def show_menu(self):
+        print("1. Start New Game")
+        print("2. Load Game")
+        print("3. Exit")
+        choice = input("Enter your choice: ")
+        match choice:
+            case "1":
+                self.start_cli()
+            case "2":
+                print("Load Game feature is not implemented yet.")
+            case "3":
+                print("Exiting the game. Goodbye!")
+                exit()
+    
+    def show_game_menu(self):
+        os.system("cls" if os.name == "nt" else "clear")
+        print(f" Day {self.get_current_days()}")
+        current_day = Day()
+        print(f"\n{current_day.get_event()['description']}\n")
+       
+        stats = self.player.get_stats()
+        print(f"--- Player Stats ---\n"
+                f"name: {stats['name']}\n"
+                f"Hunger: {stats['hunger']}\n"
+                f"Thirst: {stats['thirst']}\n"
+                f"Energy: {stats['energy']}\n"
+                f"--------------------\n")
+        print("1. Perform Action")
+        print("2. End Day")
+        choice = input("Enter your choice: ")
+        match choice:
+            case "1":
+                try:
+                    self.player.do_action()
+                    time.sleep(1)
+                    self.show_game_menu()
+                except Exception as e:
+                    print(f"Action already done")
+                    time.sleep(1)
+                    self.show_game_menu()
+            case "2":
+                self.next_day()
+                self.player.set_action_done(False)
+            case _:
+                print("Invalid choice. Please try again.")
+                time.sleep(1)
+                self.show_game_menu()
+
     def cli_game_loop(self):
         while self.get_current_days() != self.get_victory_days()+1:
-            os.system("cls" if os.name == "nt" else "clear")
-            print(f" Day {self.get_current_days()}")
-            current_day = Day()
-            print(f"\n{current_day.get_event()['description']}\n")
 
-            stats = self.player.get_stats()
-            print(f"--- Player Stats ---\n"
-                  f"name: {stats['name']}\n"
-                  f"Hunger: {stats['hunger']}\n"
-                  f"Thirst: {stats['thirst']}\n"
-                  f"Energy: {stats['energy']}\n"
-                  f"--------------------\n\n"
-                  f"What is your next action?")
-            if not self.player.get_alive():
+            self.show_game_menu()
+
+            if not self.player.is_alive():
                 print("You have died. Game Over.")
                 return
-            print("Press Enter to continue to the next day...")
-            input()
-
-            # Here would be the game logic for each day
-
-            self.next_day()
         os.system("cls" if os.name == "nt" else "clear")
         print(f"Congratulations! You've survived {self.get_victory_days()} days and won the game!")
 
-Game("Crusoe").start_cli()
+Game("Crusoe").show_menu()
