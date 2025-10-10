@@ -2,8 +2,6 @@ import os
 import time
 
 from player import Player
-from day import Day
-
 
 class Game:
     difficulty = 0
@@ -44,10 +42,12 @@ class Game:
 
     def next_day(self) -> None:
         self.current_days += 1
+        self.player.set_thirst(self.player.get_thirst()+10)
+        self.player.set_hunger(self.player.get_hunger()+10)
 
     def start_cli(self):
         print(f"Starting the game: {self.title}...")
-        time.sleep(1.5)
+        time.sleep(1)
         os.system("cls" if os.name == "nt" else "clear")
         print("What is your name?")
         player_name = str(input("Enter your name: "))
@@ -71,8 +71,10 @@ class Game:
         print(f"Difficulty set to {self.get_difficulty()}"
               f"You need to survive for {self.get_victory_days()} days to win."
               f"Good luck {self.player.get_name()}!")
-        self.next_day()
+        self.current_days=1
         self.cli_game_loop()
+
+
 
     def show_menu(self):
         print("1. Start New Game")
@@ -87,20 +89,11 @@ class Game:
             case "3":
                 print("Exiting the game. Goodbye!")
                 exit()
-    
+
     def show_game_menu(self):
         os.system("cls" if os.name == "nt" else "clear")
-        print(f" Day {self.get_current_days()}")
-        current_day = Day()
-        print(f"\n{current_day.get_event()['description']}\n")
-       
-        stats = self.player.get_stats()
-        print(f"--- Player Stats ---\n"
-                f"name: {stats['name']}\n"
-                f"Hunger: {stats['hunger']}\n"
-                f"Thirst: {stats['thirst']}\n"
-                f"Energy: {stats['energy']}\n"
-                f"--------------------\n")
+        print(f"Day {self.get_current_days()}")
+        self.player.show_stats()
         print("1. Perform Action")
         print("2. End Day")
         choice = input("Enter your choice: ")
@@ -122,8 +115,22 @@ class Game:
                 time.sleep(1)
                 self.show_game_menu()
 
+    def days_impact_effect(self,impacts):
+        for impact in impacts:
+            match (impact):
+                case "hunger":
+                    self.player.set_hunger(self.player.get_hunger()+impacts[impact])
+                case "thirst":
+                    self.player.set_thirst(self.player.get_thirst()+impacts[impact])
+                case "energy":
+                    self.player.set_energy(self.player.get_energy()+impacts[impact])
+                case _:
+                    raise KeyError("Invalid key")
+
     def cli_game_loop(self):
         while self.get_current_days() != self.get_victory_days()+1:
+
+            self.cli_days_event()
 
             self.show_game_menu()
 
