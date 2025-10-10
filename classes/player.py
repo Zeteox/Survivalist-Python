@@ -45,15 +45,15 @@ class Player:
     def set_alive(self, alive: bool) -> None:
         self.alive = alive
 
-    def get_stats(self):
-        return {
-            'name': self.name,
-            'hunger': self.hunger,
-            'thirst': self.thirst,
-            'energy': self.energy
-        }
+    def show_stats(self) -> None:
+        print(f"--- Player Stats ---\n"
+              f"name: {self.get_name()}\n"
+              f"Hunger: {self.get_hunger()}\n"
+              f"Thirst: {self.get_thirst()}\n"
+              f"Energy: {self.get_energy()}\n"
+              f"--------------------\n")
 
-    def fishing(self):
+    def fishing(self) -> None:
         if self.get_hunger() >= 10:
             self.set_hunger(self.get_hunger() - 10)
         else:
@@ -64,7 +64,7 @@ class Player:
             self.set_energy(0)
             self.set_alive(False)
 
-    def find_water(self):
+    def find_water(self) -> None:
         if self.get_thirst() >= 10:
             self.set_thirst(self.get_thirst() - 10)
         else:
@@ -75,7 +75,7 @@ class Player:
             self.set_energy(0)
             self.set_alive(False)
 
-    def sleeping(self):
+    def sleeping(self) -> None:
         if self.get_hunger() <= 90:
             self.set_hunger(self.get_hunger() + 10)
         else:
