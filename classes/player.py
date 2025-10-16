@@ -31,12 +31,27 @@ class Player:
         self.name = name
 
     def set_hunger(self, hunger: int) -> None:
+        match hunger:
+            case h if h < 0:
+                hunger = 0
+            case h if h > 100:
+                hunger = 100
         self.hunger = hunger
 
     def set_thirst(self, thirst: int) -> None:
+        match thirst:
+            case t if t < 0:
+                thirst = 0
+            case t if t > 100:
+                thirst = 100
         self.thirst = thirst
 
     def set_energy(self, energy: int) -> None:
+        match energy:
+            case e if e < 0:
+                energy = 0
+            case e if e > 100:
+                energy = 100
         self.energy = energy
 
     def set_action_done(self, action_done: bool) -> None:
@@ -53,59 +68,38 @@ class Player:
               f"Energy: {self.get_energy()}\n"
               f"--------------------\n")
 
-    def fishing(self) -> None:
-        if self.get_hunger() >= 10:
-            self.set_hunger(self.get_hunger() - 10)
-        else:
-            self.set_hunger(0)
-        if self.get_energy() >= 10:
-            self.set_energy(self.get_energy() - 10)
-        else:
-            self.set_energy(0)
-            self.set_alive(False)
+    def fish(self) -> None:
+        self.set_hunger(self.get_hunger() - 10)
+        self.is_alive()
 
     def find_water(self) -> None:
-        if self.get_thirst() >= 10:
-            self.set_thirst(self.get_thirst() - 10)
-        else:
-            self.set_thirst(0)
-        if self.get_energy() >= 10:
-            self.set_energy(self.get_energy() - 10)
-        else:
-            self.set_energy(0)
-            self.set_alive(False)
+        self.set_thirst(self.get_thirst() - 10)
+        self.set_energy(self.get_energy() - 10)
+        self.is_alive()
 
-    def sleeping(self) -> None:
-        if self.get_hunger() <= 90:
-            self.set_hunger(self.get_hunger() + 10)
-        else:
-            self.set_hunger(100)
-            self.set_alive(False)
-        if self.get_thirst() <= 90:
-            self.set_thirst(self.get_thirst() + 10)
-        else:
-            self.set_thirst(100)
-            self.set_alive(False)
-        if self.get_energy() <= 90:
-            self.set_energy(self.get_energy() + 10)
-        else:
-            self.set_energy(100)
+    def sleep(self) -> None:
+        self.set_hunger(self.get_hunger() + 10)
+        self.set_thirst(self.get_thirst() + 10)
+        self.set_energy(self.get_energy() + 10)
+        self.is_alive()
 
     def do_action(self) -> None:
         if self.action_done:
             raise Exception("Action already done")
         else:
-            print("What is your next action? (Fishing | Find water | Sleeping | Explore)")
+            print("What is your next action? (1: Fish | 2: Find water | 3: Sleep | 4: Explore)")
             choice = input('Action: ').lower().strip()
             match choice:
-                case "fishing":
-                    self.fishing()
-                case "find water":
+                case "1" | "fish":
+                    self.fish()
+                case "2" | "find water":
                     self.find_water()
-                case "sleeping":
-                    self.sleeping()
-                case "explore":
+                case "3" | "sleep":
+                    self.sleep()
+                case "4" | "explore":
                     print('you have explore the forest')
                 case _:
-                    self.do_action()
+                    print("Invalid action")
+                    return self.do_action()
             self.set_action_done(True)
+            return None
