@@ -1,9 +1,8 @@
 import os
 import time
 
+from events import do_random_event
 from player import Player
-from day import Day
-
 
 class Game:
     difficulty = 0
@@ -44,17 +43,19 @@ class Game:
 
     def next_day(self) -> None:
         self.current_days += 1
+        self.player.set_thirst(self.player.get_thirst()+10)
+        self.player.set_hunger(self.player.get_hunger()+10)
 
     def start_cli(self):
-        print(f"Starting the game: {self.title}...")
-        time.sleep(1.5)
+        os.system("cls" if os.name == "nt" else "clear")
+        print(f"Starting the game...")
+        time.sleep(0.5)
         os.system("cls" if os.name == "nt" else "clear")
         print("What is your name?")
         player_name = str(input("Enter your name: "))
         self.player = Player(player_name)
         os.system("cls" if os.name == "nt" else "clear")
-        print(f"Welcome to {self.get_title()}!\n"
-              f"choose your difficulty level:\n"
+        print(f"Choose your difficulty level:\n"
               f"1. Easy (10 days) \n"
               f"2. Medium (30 days) \n"
               f"3. Hard (90 days)")
@@ -71,10 +72,12 @@ class Game:
         print(f"Difficulty set to {self.get_difficulty()}"
               f"You need to survive for {self.get_victory_days()} days to win."
               f"Good luck {self.player.get_name()}!")
-        self.next_day()
+        self.current_days=1
         self.cli_game_loop()
 
     def show_menu(self):
+        os.system("cls" if os.name == "nt" else "clear")
+        print(f"--- Welcome to {self.get_title()} ---")
         print("1. Start New Game")
         print("2. Load Game")
         print("3. Exit")
@@ -87,22 +90,18 @@ class Game:
             case "3":
                 print("Exiting the game. Goodbye!")
                 exit()
-    
+            case _:
+                print("Invalid choice. Please try again.")
+                time.sleep(1)
+                return self.show_menu()
+
     def show_game_menu(self):
         os.system("cls" if os.name == "nt" else "clear")
-        print(f" Day {self.get_current_days()}")
-        current_day = Day()
-        print(f"\n{current_day.get_event()['description']}\n")
-       
-        stats = self.player.get_stats()
-        print(f"--- Player Stats ---\n"
-                f"name: {stats['name']}\n"
-                f"Hunger: {stats['hunger']}\n"
-                f"Thirst: {stats['thirst']}\n"
-                f"Energy: {stats['energy']}\n"
-                f"--------------------\n")
+        print(f"Day {self.get_current_days()}\n")
+        self.player.show_stats()
         print("1. Perform Action")
         print("2. End Day")
+        print("3. Exit Game")
         choice = input("Enter your choice: ")
         match choice:
             case "1":
@@ -117,18 +116,25 @@ class Game:
             case "2":
                 self.next_day()
                 self.player.set_action_done(False)
+            case "3":
+                print("Exiting the game. Goodbye!")
+                exit()
             case _:
                 print("Invalid choice. Please try again.")
                 time.sleep(1)
-                self.show_game_menu()
+                return self.show_game_menu()
 
     def cli_game_loop(self):
         while self.get_current_days() != self.get_victory_days()+1:
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"Day {self.get_current_days()}",
+                f"A new morning rise on this cursed island and...")
+            do_random_event(self.player)
 
             self.show_game_menu()
 
             if not self.player.is_alive():
-                print("You have died. Game Over.")
+                print(f"You have died on the {self.get_current_days()} day. Game Over.")
                 return
         os.system("cls" if os.name == "nt" else "clear")
         print(f"Congratulations! You've survived {self.get_victory_days()} days and won the game!")
