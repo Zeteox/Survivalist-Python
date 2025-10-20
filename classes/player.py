@@ -1,3 +1,6 @@
+from events import do_random_event
+
+
 class Player:
     def __init__(self, name):
         self.name = name
@@ -83,6 +86,10 @@ class Player:
         self.set_energy(self.get_energy() + 10)
         self.is_alive()
 
+    def explore(self) -> None:
+        do_random_event(self)
+        self.is_alive()
+
     def do_action(self) -> None:
         if self.action_done:
             raise Exception("Action already done")
@@ -97,7 +104,7 @@ class Player:
                 case "3" | "sleep":
                     self.sleep()
                 case "4" | "explore":
-                    print('you have explore the forest')
+                    self.explore()
                 case _:
                     print("Invalid action")
                     return self.do_action()
