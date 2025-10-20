@@ -1,4 +1,7 @@
+import random
+
 from events import do_random_event
+from services.jsonServices import json_reader
 
 
 class Player:
@@ -81,9 +84,12 @@ class Player:
         self.is_alive()
 
     def sleep(self) -> None:
-        self.set_hunger(self.get_hunger() + 10)
-        self.set_thirst(self.get_thirst() + 10)
-        self.set_energy(self.get_energy() + 10)
+        story = random.choice(json_reader("../data/sleep_story.json"))
+        print(story["story"])
+        input("Press enter to continue...")
+        self.set_hunger(self.get_hunger() + story["hunger"])
+        self.set_thirst(self.get_thirst() + story["thirst"])
+        self.set_energy(self.get_energy() + story["energy"])
         self.is_alive()
 
     def explore(self) -> None:
