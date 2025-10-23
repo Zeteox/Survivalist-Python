@@ -1,6 +1,6 @@
 import random
 
-from events import do_random_event
+from classes.events import do_random_event
 from services.jsonServices import json_reader
 
 
