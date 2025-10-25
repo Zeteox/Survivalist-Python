@@ -3,10 +3,16 @@ import time
 from classes.player import Player
 from services.jsonServices import json_reader, json_writer
 
-SAVE_FILE_PATH = "../data/save/save.json"
+SAVE_FILE_PATH = "./data/save/save.json"
 
 
 def save_game(game) -> bool:
+    print("Do you want to save your game? (Y/n):")
+    choice = input().strip().lower()
+    if choice not in {"y", "yes", ""}:
+        print("You chose not to save the game.")
+        input("Press enter to continue...")
+        return True
     name = game.get_save_name()
     if not name:
         print("What name would you like to give your save?")
@@ -38,9 +44,10 @@ def save_game(game) -> bool:
 
     if isinstance(all_saves, dict):
         if name.capitalize() in all_saves:
-            overwrite = input(f"A save with this name already exists. Do you want to overwrite it? (y/n):\n")
+            overwrite = input(f"A save with this name already exists. Do you want to overwrite it? (Y/n):\n")
             if overwrite.strip().lower() not in {"y", "yes", ""}:
                 print("Save cancelled.")
+                input("Press enter to continue...")
                 return False
     else:
         all_saves = {}
