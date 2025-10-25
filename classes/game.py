@@ -1,8 +1,9 @@
 import os
 import time
 
-from events import do_random_event
-from player import Player
+from classes.events import do_random_event
+from classes.action import do_action
+from classes.player import Player
 from services.saveServices import save_game, load_game, delete_game
 
 
@@ -134,7 +135,7 @@ class Game:
         match choice:
             case "1":
                 try:
-                    self.player.do_action()
+                    do_action(self, self.player)
                     time.sleep(1)
                     if not self.player.is_alive():
                         print(f"You have died on the {self.get_current_days()} day. Game Over.")
