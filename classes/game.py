@@ -76,28 +76,38 @@ class Game:
             delete_game(self.save_name)
             return
 
-    def start(self):
+    def clear_screen(self) -> None:
         os.system("cls" if os.name == "nt" else "clear")
+
+    def load_game_screen(self) -> None:
+        self.clear_screen()
+        if not load_game(self):
+            self.clear_screen()
+            tprint("Returning to main menu...", "tarty1")
+            time.sleep(1)
+            return self.start()
+        return self.cli_game_loop()
+
+    def exit_game_screen(self) -> None:
+        self.clear_screen()
+        tprint("Exiting the game. Goodbye!", "tarty1")
+        time.sleep(2)
+        self.clear_screen()
+        exit()
+
+    def start(self):
+        self.clear_screen()
         tprint(f"--- Welcome to {self.get_title()} ---", "tarty1")
         tprint("1. Start New Game","tarty1")
         tprint("2. Load Game","tarty1")
         tprint("3. Exit","tarty1")
-        choice = input("Enter your choice: ")
-        match choice:
+        match input("Enter your choice: "):
             case "1":
-                self.game_creator_cli()
-                return None
+                return self.game_creator_cli()
             case "2":
-                if not load_game(self):
-                    print("Returning to main menu...")
-                    time.sleep(1)
-                    return self.start()
-                self.cli_game_loop()
-                return None
-            case "3":   
-                os.system("cls" if os.name == "nt" else "clear")
-                print("Exiting the game. Goodbye!")
-                exit()
+                return self.load_game_screen()
+            case "3":
+                return self.exit_game_screen()
             case _:
                 print("Invalid choice. Please try again.")
                 time.sleep(1)
