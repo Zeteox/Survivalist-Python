@@ -56,6 +56,7 @@ def save_game(game) -> bool:
 
     print("Saving...")
     time.sleep(1)
+    print(all_saves )
     if json_writer(SAVE_FILE_PATH, all_saves):
         print(f"The {name.capitalize()} Game saved on {date} !")
     else:
