@@ -4,16 +4,17 @@ import random
 
 from enum import Enum
 from art import tprint
+from classes.player import Player
 
 class Event(Enum):
     RAIN = {"description": "It's  raining.", "impact": {"thirst": -10}}
     ENCOUNTER = {"description": "You  encounter  a  wild  animal.", "hunt": {"hunger": -15, "energy": -25}, "flee": {"thirst": 20,"energy": -20}}
     FIND = {"description": "You  find  a  hidden  stash  of  supplies.", "impact": {"hunger": -15, "thirst":-15}}
 
-def get_random_event():
+def get_random_event() -> Event:
     return random.choice(list(Event)).value
 
-def do_random_event(player, event=None):
+def do_random_event(player:Player, event=None) -> None:
         if event is None:
             event = get_random_event()
         tprint(f"{event["description"]}\n", "small")
@@ -42,7 +43,7 @@ def do_random_event(player, event=None):
         input("Press enter to continue...")
         return
 
-def event_impact_effect(player,impacts):
+def event_impact_effect(player:Player,impacts:dict) -> None:
         for impact in impacts:
             match (impact):
                 case "hunger":
