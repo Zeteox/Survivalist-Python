@@ -1,3 +1,4 @@
+from art import tprint
 class Player:
     def __init__(self, name):
         self.name = name
@@ -61,9 +62,9 @@ class Player:
         self.alive = alive
 
     def show_stats(self) -> None:
-        print(f"--- Player Stats ---\n"
-              f"name: {self.get_name()}\n"
-              f"Hunger: {self.get_hunger()}\n"
-              f"Thirst: {self.get_thirst()}\n"
-              f"Energy: {self.get_energy()}\n"
-              f"--------------------\n")
+        tprint(f"--- Player  Stats ---\n"
+              f"name:  {self.get_name()}\n"
+              f"Hunger:  {100 - self.get_hunger()}\n"
+              f"Thirst:  {100 - self.get_thirst()}\n"
+              f"Energy:  {self.get_energy()}\n"
+              f"----------------------\n", "tarty1")
