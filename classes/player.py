@@ -175,7 +175,7 @@ class Player:
             raise Exception("Action already done")
         else:
             tprint("What is your next action?\n"
-                   "1     : Fish                         |    2: Find water    |    3: Sleep\n"
+                   "1     : Fish                        |    2: Find water    |    3: Sleep\n"
                    "4: Explore    |    5: Cancel")
             choice = input('Action: ').lower().strip()
             match choice:
