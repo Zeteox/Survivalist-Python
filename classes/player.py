@@ -1,7 +1,6 @@
 import random
 import time
 
-from classes.events import do_random_event
 from services.jsonServices import json_reader
 from utils import miniGameUtils
 from utils.displayUtils import clear_screen
@@ -86,16 +85,18 @@ class Player:
         :return: None
         """
         clear_screen()
-        print("You are trying to find water...\nGood luck!\n")
+        tprint("You  are  trying  to  find  water...\nYou'll need to memorize a sequence.\nGood  luck!\n", "tarty1")
+        input("press enter when you are ready...")
         length = random.randint(1, 8)
         seq_expected = miniGameUtils.memory_sequence_challenge(length=length)
-        answer = "".join(input("Enter the sequence of directions (ex: N S E W ou NSEW) : ").upper().strip())
+        tprint("Enter  the  sequence  of  directions (ex:  N  S  E  W  ou  NSEW)", "small")
+        answer = "".join(input("Sequence : ").upper().strip())
         if answer == seq_expected:
-            print("Congratulations! You found water.")
+            tprint("Congratulations!  You  found  water.", "small")
             self.set_thirst(self.get_thirst() - 30)
             self.set_energy(self.get_energy() - 5)
         else:
-            print("You got lost while searching for water. You are more thirsty and tired.")
+            tprint("You  got  lost  while  searching  for  water.\nYou  are  more  thirsty  and  tired.", "small")
             self.set_thirst(self.get_thirst() + 10)
             self.set_energy(self.get_energy() - 10)
         input("Press enter to continue...")
@@ -111,8 +112,8 @@ class Player:
         self.set_thirst(self.get_thirst() + story["thirst"])
         self.set_energy(self.get_energy() + story["energy"])
         clear_screen()
-        print("You have choose to go to sleep...\nAnd now your make a dream...\n")
-        print(story["story"])
+        tprint("You have choose to go to sleep...\nAnd now your make a dream...\n-   -   -", "small")
+        tprint(story["story"]+"\n-   -   -", "small")
         input("Press enter to continue...")
 
     def explore(self) -> None:
@@ -122,8 +123,9 @@ class Player:
         :type self: Player
         :return: None
         """
+        from classes.events import do_random_event
         clear_screen()
-        print("You decided to explore the environment...")
+        tprint("You decided to explore the environment...", "small")
         do_random_event(self)
 
     def fish(self) -> None:
@@ -136,17 +138,17 @@ class Player:
         """
         fish = miniGameUtils.get_fish()
         clear_screen()
-        print("When the fish appears, press the space bar while it is visible. (If you aren't on Windows, press Enter instead)")
+        tprint("When  the  fish  appears,  press  the  space  bar  while  it  is  visible.\n(If  you  aren't  on  Windows,  press  Enter  instead)", "small")
+        tprint("Get  ready...","small")
         input("Press Enter to start...")
-        print("Get ready...")
 
         wait_time = random.uniform(2.0, 5.0)
         time.sleep(wait_time)
-        display_time = random.uniform(0.5, 2.0)
+        display_time = random.uniform(0.5, 1.5)
 
         # Display fish and start timing
         clear_screen()
-        print("The fish has appeared! Press Space now!")
+        tprint("The  fish  has  appeared!  Press  Space  now!", "small")
         if fish and isinstance(fish, dict) and fish.get("design"):
             print(fish["design"])
         start_display = time.perf_counter()
@@ -154,14 +156,14 @@ class Player:
         is_pressed_space = miniGameUtils.is_spacebar_pressed(display_time, start_display)
 
         # Display result and update stats
-        clear_screen()
         if is_pressed_space:
-            print(f"Congratulations! You caught a {fish["name"]}!")
+            tprint(f"Congratulations!  You  caught  a  {fish["name"]}!", "small")
             self.set_hunger(self.get_hunger() - fish["hunger"])
             self.set_energy(self.get_energy() - fish["energy"])
         else:
-            print("You missed the fish. Better luck next time!")
+            tprint("You  missed  the  fish. Better  luck  next  time!", "small")
             self.set_energy(self.get_energy() - fish["energy"])
+        time.sleep(1.5)
 
     def do_action(self) -> None:
         """
@@ -172,7 +174,9 @@ class Player:
         if self.action_done:
             raise Exception("Action already done")
         else:
-            print("What is your next action? (1: Fish | 2: Find water | 3: Sleep | 4: Explore)")
+            tprint("What is your next action?\n"
+                   "1     : Fish                         |    2: Find water    |    3: Sleep\n"
+                   "4: Explore    |    5: Cancel")
             choice = input('Action: ').lower().strip()
             match choice:
                 case "1" | "fish":
@@ -183,6 +187,8 @@ class Player:
                     self.sleep()
                 case "4" | "explore":
                     self.explore()
+                case "5" | "cancel":
+                    return None
                 case _:
                     print("Invalid action")
                     return self.do_action()
