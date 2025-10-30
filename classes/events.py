@@ -1,10 +1,12 @@
-import os
+from enum import Enum
 import time
 import random
 
 from enum import Enum
 from art import tprint
 from classes.player import Player
+from utils.displayUtils import clear_screen
+
 
 class Event(Enum):
     RAIN = {"description": "It's  raining.", "impact": {"thirst": -10}}
@@ -38,7 +40,7 @@ def do_random_event(player:Player, event=None) -> None:
             else:
                 print("Invalid choice. Please try again.")
                 time.sleep(1)
-                os.system("cls" if os.name == "nt" else "clear")
+                clear_screen()
                 return do_random_event(player, event)
         input("Press enter to continue...")
         return

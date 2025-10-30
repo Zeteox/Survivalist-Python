@@ -1,12 +1,10 @@
-import os
-import random
 import time
 
 from art import tprint
 from classes.events import do_random_event
-from classes.action import do_action
 from classes.player import Player
 from services.saveServices import save_game, load_game, delete_game
+from utils.displayUtils import clear_screen
 
 
 class Game:
@@ -78,34 +76,31 @@ class Game:
 
     def is_game_over(self) -> None:
         if not self.player.is_alive():
-            self.clear_screen()
+            clear_screen()
             tprint(f"Day  {self.get_current_days()}", "tarty1")
             self.player.show_stats()
             tprint("You  have  died.\nGame  Over.", "tarty1")
             delete_game(self.save_name)
             return self.restart()
 
-    def clear_screen(self) -> None:
-        os.system("cls" if os.name == "nt" else "clear")
-
     def load_game_screen(self) -> None:
-        self.clear_screen()
+        clear_screen()
         if not load_game(self):
-            self.clear_screen()
+            clear_screen()
             tprint("Returning to main menu...", "tarty1")
             time.sleep(1)
             return self.start()
         return self.cli_game_loop()
 
     def exit_game_screen(self) -> None:
-        self.clear_screen()
+        clear_screen()
         tprint("Exiting the game. Goodbye!", "tarty1")
         time.sleep(2)
-        self.clear_screen()
+        clear_screen()
         exit()
 
     def start(self) -> None:
-        self.clear_screen()
+        clear_screen()
         tprint(f"---  Welcome  to  {self.get_title()}  ---", "tarty1")
         tprint("1.  Start  New  Game","tarty1")
         tprint("2.  Load  Game","tarty1")
@@ -123,13 +118,13 @@ class Game:
                 return self.start()
 
     def game_creator_cli(self) -> None:
-        self.clear_screen()
+        clear_screen()
         tprint(f"Starting  the  game...", "tarty1")
         time.sleep(0.5)
-        self.clear_screen()
+        clear_screen()
         tprint("Choose  your  name", "tarty1")
         self.player = Player(str(input("Enter your name: ")))
-        self.clear_screen()
+        clear_screen()
         tprint(f"Choose  your  difficulty:\n"
               f"1.  Easy  -  10 days\n"
               f"2.  Medium  -  30 days\n"
@@ -152,7 +147,7 @@ class Game:
         self.cli_game_loop()
 
     def show_game_menu(self) -> None:
-        self.clear_screen()
+        clear_screen()
         tprint(f"Day  {self.get_current_days()}\n", "tarty1")
         self.player.show_stats()
         tprint(f"1. Perform  Action\n"
@@ -162,7 +157,7 @@ class Game:
         match choice:
             case "1":
                 try:
-                    do_action(self, self.player)
+                    self.player.do_action()
                     return self.is_game_over()
                 except Exception as e:
                     tprint(f"Action already done","tarty1")
@@ -187,7 +182,7 @@ class Game:
     def cli_game_loop(self) -> None:
         while self.get_current_days() != self.get_victory_days() + 1:
             self.is_game_over()
-            self.clear_screen()
+            clear_screen()
             if not self.random_event_done and random.randint(1,3) == 1 :
                 tprint(f"Day {self.get_current_days()}\n", "tarty1")
                 self.player.show_stats()
@@ -198,7 +193,7 @@ class Game:
                 self.random_event_done = True
             self.is_game_over()
             self.show_game_menu()
-        self.clear_screen()
+        clear_screen()
         delete_game(self.save_name)
         tprint(f"Congratulations!\nYou've survived {self.get_victory_days()} days!\nYou won the game!", "tarty1")
         self.restart()
