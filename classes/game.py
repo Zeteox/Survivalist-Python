@@ -1,11 +1,10 @@
-import os
 import time
 
 from art import tprint
 from classes.events import do_random_event
-from classes.action import do_action
 from classes.player import Player
 from services.saveServices import save_game, load_game, delete_game
+from utils.displayUtils import clear_screen
 
 
 class Game:
@@ -76,27 +75,24 @@ class Game:
             delete_game(self.save_name)
             return
 
-    def clear_screen(self) -> None:
-        os.system("cls" if os.name == "nt" else "clear")
-
     def load_game_screen(self) -> None:
-        self.clear_screen()
+        clear_screen()
         if not load_game(self):
-            self.clear_screen()
+            clear_screen()
             tprint("Returning to main menu...", "tarty1")
             time.sleep(1)
             return self.start()
         return self.cli_game_loop()
 
     def exit_game_screen(self) -> None:
-        self.clear_screen()
+        clear_screen()
         tprint("Exiting the game. Goodbye!", "tarty1")
         time.sleep(2)
-        self.clear_screen()
+        clear_screen()
         exit()
 
     def start(self):
-        self.clear_screen()
+        clear_screen()
         tprint(f"--- Welcome to {self.get_title()} ---", "tarty1")
         tprint("1. Start New Game","tarty1")
         tprint("2. Load Game","tarty1")
@@ -114,14 +110,14 @@ class Game:
                 return self.start()
 
     def game_creator_cli(self):
-        os.system("cls" if os.name == "nt" else "clear")
+        clear_screen()
         print(f"Starting the game...")
         time.sleep(0.5)
-        os.system("cls" if os.name == "nt" else "clear")
+        clear_screen()
         print("What is your name?")
         player_name = str(input("Enter your name: "))
         self.player = Player(player_name)
-        os.system("cls" if os.name == "nt" else "clear")
+        clear_screen()
         print(f"Choose your difficulty level:\n"
               f"1. Easy (10 days) \n"
               f"2. Medium (30 days) \n"
@@ -143,7 +139,7 @@ class Game:
         self.cli_game_loop()
 
     def show_game_menu(self):
-        os.system("cls" if os.name == "nt" else "clear")
+        clear_screen()
         print(f"Day {self.get_current_days()}\n")
         self.player.show_stats()
         print("1. Perform Action")
@@ -153,7 +149,7 @@ class Game:
         match choice:
             case "1":
                 try:
-                    do_action(self, self.player)
+                    self.player.do_action()
                     time.sleep(1)
                     self.is_game_over()
                     self.show_game_menu()
@@ -180,7 +176,7 @@ class Game:
 
     def cli_game_loop(self):
         while self.get_current_days() != self.get_victory_days() + 1:
-            os.system("cls" if os.name == "nt" else "clear")
+            clear_screen()
             print(f"Day {self.get_current_days()}",
                   f"A new morning rise on this cursed island and...")
             if not self.random_event_done:
@@ -191,6 +187,6 @@ class Game:
 
             self.show_game_menu()
 
-        os.system("cls" if os.name == "nt" else "clear")
+        clear_screen()
         delete_game(self.save_name)
         print(f"Congratulations! You've survived {self.get_victory_days()} days and won the game!")
