@@ -163,7 +163,7 @@ class Player:
         else:
             tprint("You  missed  the  fish. Better  luck  next  time!", "small")
             self.set_energy(self.get_energy() - fish["energy"])
-        time.sleep(1.5)
+        time.sleep(2)
 
     def do_action(self) -> None:
         """

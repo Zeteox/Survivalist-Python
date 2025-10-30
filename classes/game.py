@@ -9,6 +9,9 @@ from utils.displayUtils import clear_screen
 
 
 class Game:
+    """
+    Game class containing all game logic
+    """
     title = "Crusoe"
     difficulty = 0
     victory_days = 0
@@ -18,6 +21,8 @@ class Game:
     save_name = ""
 
     def __init__(self):
+        """Initialization of the game class, setting the days counter to 0
+        """
         self.days_counter = 0
 
     def get_title(self) -> str:
@@ -61,21 +66,39 @@ class Game:
             self.random_event_done = True
 
     def chose_difficulty(self, level: int) -> None:
+        """
+        Function that set the victory days number requiremen at
+        a certains number depending on the difficulty got in params
+
+        Args:
+            level (int): level of difficulty (1-3)
+        """
         self.difficulty = level
-        # Set victory days based on difficulty level
         self.set_victory_days(10 if level == 1 else 30 if level == 2 else 90)
 
     def next_day(self) -> None:
+        """Funtion that change the day and reset all days related variables
+        """
         self.current_days += 1
         self.player.set_thirst(self.player.get_thirst() + 10)
         self.player.set_hunger(self.player.get_hunger() + 10)
 
     def restart(self) -> None:
+        """Function to restart the game
+
+        Returns:
+            None
+        """
         if input("restart ? (y/N): ").upper() in ["Y", "YES"]:
             return self.game_creator_cli()
         return self.exit_game_screen()
 
     def is_game_over(self) -> None:
+        """function that verify is the player is dead and end the game if so.
+
+        Returns:
+            None
+        """
         if not self.player.is_alive():
             clear_screen()
             tprint(f"Day  {self.get_current_days()}", "tarty1")
@@ -85,6 +108,11 @@ class Game:
             return self.restart()
 
     def load_game_screen(self) -> None:
+        """Function that show the game loading screen when a save is selected.
+
+        Returns:
+            None
+        """
         clear_screen()
         if not load_game(self):
             clear_screen()
@@ -94,6 +122,8 @@ class Game:
         return self.cli_game_loop()
 
     def exit_game_screen(self) -> None:
+        """Function that show the exit game screen when we exited or didnt whanted to restart.
+        """
         clear_screen()
         tprint("Exiting the game. Goodbye!", "tarty1")
         time.sleep(2)
@@ -101,6 +131,12 @@ class Game:
         exit()
 
     def start(self) -> None:
+        """Function that is used to start the game, it will send you to the main menu
+        to select if you want to start a new game, load one or quit.
+
+        Returns:
+            None
+        """
         clear_screen()
         tprint(f"---  Welcome  to  {self.get_title()}  ---", "tarty1")
         tprint("1.  Start  New  Game","tarty1")
@@ -119,6 +155,8 @@ class Game:
                 return self.start()
 
     def game_creator_cli(self) -> None:
+        """Function that open when you start a new game or restart to configurate a new game in cli(player name, difficulty)
+        """
         clear_screen()
         tprint(f"Starting  the  game...", "tarty1")
         time.sleep(0.5)
@@ -148,6 +186,12 @@ class Game:
         self.cli_game_loop()
 
     def show_game_menu(self) -> None:
+        """show_game_menu() is a very important function, it serve to see your stats/progress in the game\n
+        and select want you want to do every days. As well as the possibility to quit and save.
+
+        Returns:
+            None
+        """
         clear_screen()
         tprint(f"Day  {self.get_current_days()}\n", "tarty1")
         self.player.show_stats()
@@ -181,6 +225,9 @@ class Game:
                 return self.show_game_menu()
 
     def cli_game_loop(self) -> None:
+        """Heart of the game, the game loop, here is where all the logic of the game is executed, events,\n
+        days passing by, and verifying if the player is still alive.
+        """
         while self.get_current_days() != self.get_victory_days() + 1:
             self.is_game_over()
             clear_screen()
