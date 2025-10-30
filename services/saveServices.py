@@ -3,6 +3,7 @@ import time
 from art import tprint
 from classes.player import Player
 from services.jsonServices import json_reader, json_writer
+from utils.displayUtils import clear_screen
 
 SAVE_FILE_PATH = "./data/save/save.json"
 
@@ -80,12 +81,12 @@ def load_game(game) -> bool:
     if name.capitalize() in all_saves:
         selection_save = all_saves.get(name.capitalize())
     else:
-        game.clear_screen()
+        clear_screen()
         tprint("Save not found.", "tarty1")
         time.sleep(1)
         return False
 
-    game.clear_screen()
+    clear_screen()
     tprint("Loading game...", "tarty1")
     game.chose_difficulty(selection_save.get("difficulty"))
     game.set_current_days(selection_save.get("current_days"))
@@ -97,7 +98,7 @@ def load_game(game) -> bool:
     game.player.set_action_done(selection_save.get("player").get("action_done"))
     game.player.set_alive(selection_save.get("player").get("alive"))
     time.sleep(1)
-    game.clear_screen()
+    clear_screen()
     tprint(f"Game {name.capitalize()} loaded!", "tarty1")
     game.set_save_name(name.capitalize())
     time.sleep(2)
