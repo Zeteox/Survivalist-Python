@@ -1,0 +1,80 @@
+from enum import Enum
+import time
+import random
+
+from enum import Enum
+from art import tprint
+from classes.player import Player
+from utils.displayUtils import clear_screen
+
+
+class Event(Enum):
+    """
+    Event is an Enum that contain all evetns callables in the game.
+    Each event is a dictionnary
+    """
+    RAIN = {"description": "It's  raining.", "impact": {"thirst": -10}}
+    ENCOUNTER = {"description": "You  encounter  a  wild  animal.", "hunt": {"hunger": -15, "energy": -25}, "flee": {"thirst": 20,"energy": -20}}
+    FIND = {"description": "You  find  a  hidden  stash  of  supplies.", "impact": {"hunger": -15, "thirst":-15}}
+
+def get_random_event() -> dict:
+    return random.choice(list(Event)).value
+
+def do_random_event(player:Player, event=None) -> None:
+    """Function that call a random event on the player and affect him.
+
+    Args:
+        player (Player): the player doign this event
+        event (dict, optional): the contetn of the event. Defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
+    if event is None:
+        event = get_random_event()
+    tprint(f"{event["description"]}\n", "small")
+
+    if ("impact" in event):
+        tprint("Impact(s):", "small")
+        for elem in event["impact"]:
+            tprint("    -  "+elem+f"  ( {-event["impact"][elem]} )", "small")
+        event_impact_effect(player, event["impact"])
+    else: #for custom event with multiples choices
+        keys=list(event.keys())[1::]
+        for option in keys:
+            tprint(option+":", "small")
+            for impact in event[option]:
+                invertOperator= 1 if impact == "energy" else -1
+                tprint("    -  "+impact+f"  ( {invertOperator * event[option][impact]} )", "small")
+
+        choice = input("Choice: ").lower().strip()
+        if choice in keys:
+            event_impact_effect(player,event[choice])
+        else:
+            print("Invalid choice. Please try again.")
+            time.sleep(1)
+            clear_screen()
+            return do_random_event(player, event)
+    input("Press enter to continue...")
+    return
+
+def event_impact_effect(player:Player,impacts:dict) -> None:
+    """Function that apply the event effect to the player
+
+    Args:
+        player (Player): the player to affect
+        impacts (dict): the impacts on the player
+
+    Raises:
+        KeyError: error when the impact dotn exist
+    """
+    for impact in impacts:
+        match (impact):
+            case "hunger":
+                player.set_hunger(player.get_hunger()+impacts[impact])
+            case "thirst":
+                player.set_thirst(player.get_thirst()+impacts[impact])
+            case "energy":
+                player.set_energy(player.get_energy()+impacts[impact])
+            case _:
+                raise KeyError("Invalid key")
