@@ -72,12 +72,17 @@
 git clone https://github.com/Zeteox/Survivalist-Python.git
 ```
 
-2. Open a console in the project directory and install dependencies:
+2. Ensure you have pip:
+```bash
+py -m ensurepip --upgrade
+```
+
+3. Open a console in the project directory and install dependencies:
 ```bash
 py -m pip install art
 ```
 
-2. Launch the game using the command line or open **start.bat**:
+4. Launch the game using the command line or open **start.bat**:
 ```bash
 py ./main
 ```
