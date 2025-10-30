@@ -58,7 +58,6 @@ def save_game(game) -> bool:
 
     print("Saving...")
     time.sleep(1)
-    print(all_saves )
     if json_writer(SAVE_FILE_PATH, all_saves):
         print(f"The {name.capitalize()} Game saved on {date} !")
     else:
@@ -107,7 +106,6 @@ def load_game(game) -> bool:
 def delete_game(save_name: str) -> None:
     all_saves = json_reader(SAVE_FILE_PATH)
     if not all_saves:
-        print("No saves found.")
         return
     if save_name.capitalize() in all_saves:
         del all_saves[save_name.capitalize()]

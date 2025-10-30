@@ -69,11 +69,19 @@ class Game:
         self.player.set_thirst(self.player.get_thirst() + 10)
         self.player.set_hunger(self.player.get_hunger() + 10)
 
+    def restart(self) -> None:
+        if input("restart ? (y/N): ").upper() in ["Y", "YES"]:
+            return self.game_creator_cli()
+        return self.exit_game_screen()
+
     def is_game_over(self) -> None:
         if not self.player.is_alive():
-            print(f"You have died on the {self.get_current_days()} day. Game Over.")
+            clear_screen()
+            tprint(f"Day  {self.get_current_days()}", "tarty1")
+            self.player.show_stats()
+            tprint("You  have  died.\nGame  Over.", "tarty1")
             delete_game(self.save_name)
-            return
+            return self.restart()
 
     def load_game_screen(self) -> None:
         clear_screen()
@@ -91,12 +99,12 @@ class Game:
         clear_screen()
         exit()
 
-    def start(self):
+    def start(self) -> None:
         clear_screen()
-        tprint(f"--- Welcome to {self.get_title()} ---", "tarty1")
-        tprint("1. Start New Game","tarty1")
-        tprint("2. Load Game","tarty1")
-        tprint("3. Exit","tarty1")
+        tprint(f"---  Welcome  to  {self.get_title()}  ---", "tarty1")
+        tprint("1.  Start  New  Game","tarty1")
+        tprint("2.  Load  Game","tarty1")
+        tprint("3.  Exit","tarty1")
         match input("Enter your choice: "):
             case "1":
                 return self.game_creator_cli()
@@ -109,19 +117,18 @@ class Game:
                 time.sleep(1)
                 return self.start()
 
-    def game_creator_cli(self):
+    def game_creator_cli(self) -> None:
         clear_screen()
-        print(f"Starting the game...")
+        tprint(f"Starting  the  game...", "tarty1")
         time.sleep(0.5)
         clear_screen()
-        print("What is your name?")
-        player_name = str(input("Enter your name: "))
-        self.player = Player(player_name)
+        tprint("Choose  your  name", "tarty1")
+        self.player = Player(str(input("Enter your name: ")))
         clear_screen()
-        print(f"Choose your difficulty level:\n"
-              f"1. Easy (10 days) \n"
-              f"2. Medium (30 days) \n"
-              f"3. Hard (90 days)")
+        tprint(f"Choose  your  difficulty:\n"
+              f"1.  Easy  -  10 days\n"
+              f"2.  Medium  -  30 days\n"
+              f"3.  Hard  -  90 days", "tarty1")
         while True:
             try:
                 level = int(input("Enter difficulty level (1-3): "))
@@ -132,61 +139,61 @@ class Game:
                     print("Invalid choice. Please choose a number between 1 and 3.")
             except ValueError:
                 print("Invalid input. Please enter a number.")
-        print(f"Difficulty set to {self.get_difficulty()}"
-              f"You need to survive for {self.get_victory_days()} days to win."
-              f"Good luck {self.player.get_name()}!")
+        tprint(f"Difficulty set to {self.get_difficulty()}.\n"
+              f"You need to survive for {self.get_victory_days()} days to win.\n"
+              f"Good luck player {self.player.get_name()}!", "small")
+        time.sleep(3)
         self.current_days = 1
         self.cli_game_loop()
 
-    def show_game_menu(self):
+    def show_game_menu(self) -> None:
         clear_screen()
-        print(f"Day {self.get_current_days()}\n")
+        tprint(f"Day  {self.get_current_days()}\n", "tarty1")
         self.player.show_stats()
-        print("1. Perform Action")
-        print("2. End Day")
-        print("3. Exit Game")
+        tprint(f"1. Perform  Action\n"
+               f"2. End  Day\n"
+               f"3. Exit  Game", "tarty1")
         choice = input("Enter your choice: ")
         match choice:
             case "1":
                 try:
                     self.player.do_action()
-                    time.sleep(1)
-                    self.is_game_over()
-                    self.show_game_menu()
+                    return self.is_game_over()
                 except Exception as e:
-                    print(f"Action already done")
+                    tprint(f"Action already done","tarty1")
                     time.sleep(1)
-                    self.show_game_menu()
+                return self.show_game_menu()
             case "2":
-                self.next_day()
+                self.is_game_over()
                 self.player.set_action_done(False)
                 self.invert_random_event_done()
-                return None
+                return self.next_day()
             case "3":
                 if save_game(self):
-                    print("Exiting the game. Goodbye!")
-                    exit()
-                else:
                     time.sleep(1)
+                    return self.exit_game_screen()
+                else:
                     return self.show_game_menu()
             case _:
                 print("Invalid choice. Please try again.")
                 time.sleep(1)
                 return self.show_game_menu()
 
-    def cli_game_loop(self):
+    def cli_game_loop(self) -> None:
         while self.get_current_days() != self.get_victory_days() + 1:
+            self.is_game_over()
             clear_screen()
-            print(f"Day {self.get_current_days()}",
-                  f"A new morning rise on this cursed island and...")
-            if not self.random_event_done:
+            if not self.random_event_done and random.randint(1,3) == 1 :
+                tprint(f"Day {self.get_current_days()}\n", "tarty1")
+                self.player.show_stats()
+                tprint("A  new  morning  rise  on  this  cursed  island.", "small",)
                 do_random_event(self.player)
                 self.invert_random_event_done()
-
+            else:
+                self.random_event_done = True
             self.is_game_over()
-
             self.show_game_menu()
-
         clear_screen()
         delete_game(self.save_name)
-        print(f"Congratulations! You've survived {self.get_victory_days()} days and won the game!")
+        tprint(f"Congratulations!\nYou've survived {self.get_victory_days()} days!\nYou won the game!", "tarty1")
+        self.restart()

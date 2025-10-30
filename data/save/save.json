@@ -1,17 +1,1 @@
-{
-  "Vzzf": {
-    "date": "28/10/2025 10:30:14",
-    "difficulty": 1,
-    "current_days": 1,
-    "victory_days": 10,
-    "random_event_done": true,
-    "player": {
-      "name": "zgezg",
-      "hunger": 0,
-      "thirst": 0,
-      "energy": 75,
-      "action_done": false,
-      "alive": true
-    }
-  }
-}
+{}
