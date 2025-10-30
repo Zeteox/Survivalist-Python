@@ -1,12 +1,15 @@
 import os
 import time
 
-from events import do_random_event
-from player import Player
+from art import tprint
+from classes.events import do_random_event
+from classes.action import do_action
+from classes.player import Player
 from services.saveServices import save_game, load_game, delete_game
 
 
 class Game:
+    title = "Crusoe"
     difficulty = 0
     victory_days = 0
     current_days = 0
@@ -14,8 +17,7 @@ class Game:
     random_event_done = False
     save_name = ""
 
-    def __init__(self, title: str):
-        self.title = title
+    def __init__(self):
         self.days_counter = 0
 
     def get_title(self) -> str:
@@ -68,7 +70,50 @@ class Game:
         self.player.set_thirst(self.player.get_thirst() + 10)
         self.player.set_hunger(self.player.get_hunger() + 10)
 
-    def start_cli(self):
+    def is_game_over(self) -> None:
+        if not self.player.is_alive():
+            print(f"You have died on the {self.get_current_days()} day. Game Over.")
+            delete_game(self.save_name)
+            return
+
+    def clear_screen(self) -> None:
+        os.system("cls" if os.name == "nt" else "clear")
+
+    def load_game_screen(self) -> None:
+        self.clear_screen()
+        if not load_game(self):
+            self.clear_screen()
+            tprint("Returning to main menu...", "tarty1")
+            time.sleep(1)
+            return self.start()
+        return self.cli_game_loop()
+
+    def exit_game_screen(self) -> None:
+        self.clear_screen()
+        tprint("Exiting the game. Goodbye!", "tarty1")
+        time.sleep(2)
+        self.clear_screen()
+        exit()
+
+    def start(self):
+        self.clear_screen()
+        tprint(f"--- Welcome to {self.get_title()} ---", "tarty1")
+        tprint("1. Start New Game","tarty1")
+        tprint("2. Load Game","tarty1")
+        tprint("3. Exit","tarty1")
+        match input("Enter your choice: "):
+            case "1":
+                return self.game_creator_cli()
+            case "2":
+                return self.load_game_screen()
+            case "3":
+                return self.exit_game_screen()
+            case _:
+                print("Invalid choice. Please try again.")
+                time.sleep(1)
+                return self.start()
+
+    def game_creator_cli(self):
         os.system("cls" if os.name == "nt" else "clear")
         print(f"Starting the game...")
         time.sleep(0.5)
@@ -97,32 +142,6 @@ class Game:
         self.current_days = 1
         self.cli_game_loop()
 
-    def show_menu(self):
-        os.system("cls" if os.name == "nt" else "clear")
-        print(f"--- Welcome to {self.get_title()} ---")
-        print("1. Start New Game")
-        print("2. Load Game")
-        print("3. Exit")
-        choice = input("Enter your choice: ")
-        match choice:
-            case "1":
-                self.start_cli()
-                return None
-            case "2":
-                if not load_game(self):
-                    print("Returning to main menu...")
-                    time.sleep(1)
-                    return self.show_menu()
-                self.cli_game_loop()
-                return None
-            case "3":
-                print("Exiting the game. Goodbye!")
-                exit()
-            case _:
-                print("Invalid choice. Please try again.")
-                time.sleep(1)
-                return self.show_menu()
-
     def show_game_menu(self):
         os.system("cls" if os.name == "nt" else "clear")
         print(f"Day {self.get_current_days()}\n")
@@ -134,12 +153,9 @@ class Game:
         match choice:
             case "1":
                 try:
-                    self.player.do_action()
+                    do_action(self, self.player)
                     time.sleep(1)
-                    if not self.player.is_alive():
-                        print(f"You have died on the {self.get_current_days()} day. Game Over.")
-                        delete_game(self.save_name)
-                        return None
+                    self.is_game_over()
                     self.show_game_menu()
                 except Exception as e:
                     print(f"Action already done")
@@ -155,6 +171,7 @@ class Game:
                     print("Exiting the game. Goodbye!")
                     exit()
                 else:
+                    time.sleep(1)
                     return self.show_game_menu()
             case _:
                 print("Invalid choice. Please try again.")
@@ -170,16 +187,10 @@ class Game:
                 do_random_event(self.player)
                 self.invert_random_event_done()
 
-            if not self.player.is_alive():
-                print(f"You have died on the {self.get_current_days()} day. Game Over.")
-                delete_game(self.save_name)
-                return
+            self.is_game_over()
 
             self.show_game_menu()
 
         os.system("cls" if os.name == "nt" else "clear")
         delete_game(self.save_name)
         print(f"Congratulations! You've survived {self.get_victory_days()} days and won the game!")
-
-
-Game("Crusoe").show_menu()

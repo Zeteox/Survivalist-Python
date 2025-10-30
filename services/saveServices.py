@@ -1,12 +1,19 @@
 import time
 
+from art import tprint
 from classes.player import Player
 from services.jsonServices import json_reader, json_writer
 
-SAVE_FILE_PATH = "../data/save/save.json"
+SAVE_FILE_PATH = "./data/save/save.json"
 
 
 def save_game(game) -> bool:
+    print("Do you want to save your game? (Y/n):")
+    choice = input().strip().lower()
+    if choice not in {"y", "yes", ""}:
+        print("You chose not to save the game.")
+        input("Press enter to continue...")
+        return True
     name = game.get_save_name()
     if not name:
         print("What name would you like to give your save?")
@@ -38,9 +45,10 @@ def save_game(game) -> bool:
 
     if isinstance(all_saves, dict):
         if name.capitalize() in all_saves:
-            overwrite = input(f"A save with this name already exists. Do you want to overwrite it? (y/n):\n")
+            overwrite = input(f"A save with this name already exists. Do you want to overwrite it? (Y/n):\n")
             if overwrite.strip().lower() not in {"y", "yes", ""}:
                 print("Save cancelled.")
+                input("Press enter to continue...")
                 return False
     else:
         all_saves = {}
@@ -49,6 +57,7 @@ def save_game(game) -> bool:
 
     print("Saving...")
     time.sleep(1)
+    print(all_saves )
     if json_writer(SAVE_FILE_PATH, all_saves):
         print(f"The {name.capitalize()} Game saved on {date} !")
     else:
@@ -56,26 +65,28 @@ def save_game(game) -> bool:
         return False
     return True
 
-
 def load_game(game) -> bool:
+    tprint("Loading game...", "tarty1")
     all_saves = json_reader(SAVE_FILE_PATH)
     if not all_saves:
         print("No saves found.")
         return False
 
-    print("Available saves:")
+    print("Available saves:\n")
     for save_name in all_saves:
         save = all_saves.get(save_name)
         print(f"- {save_name} (Date: {save.get('date')}, Difficulty: {save.get('difficulty')}, Day: {save.get('current_days')}/{save.get('victory_days')})")
-    print("Enter the name of the save you want to load:")
-    name = input("Save name: ").strip()
+    name = input("\nEnter the name of the save to load: ").strip()
     if name.capitalize() in all_saves:
         selection_save = all_saves.get(name.capitalize())
     else:
-        print("Save not found.")
+        game.clear_screen()
+        tprint("Save not found.", "tarty1")
+        time.sleep(1)
         return False
 
-    print("Loading...")
+    game.clear_screen()
+    tprint("Loading game...", "tarty1")
     game.chose_difficulty(selection_save.get("difficulty"))
     game.set_current_days(selection_save.get("current_days"))
     game.set_random_event_done(selection_save.get("random_event_done"))
@@ -86,8 +97,10 @@ def load_game(game) -> bool:
     game.player.set_action_done(selection_save.get("player").get("action_done"))
     game.player.set_alive(selection_save.get("player").get("alive"))
     time.sleep(1)
-    print(f"Game {name.capitalize()} loaded!")
+    game.clear_screen()
+    tprint(f"Game {name.capitalize()} loaded!", "tarty1")
     game.set_save_name(name.capitalize())
+    time.sleep(2)
     return True
 
 def delete_game(save_name: str) -> None:
