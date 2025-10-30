@@ -3,6 +3,7 @@ import time
 
 from services.jsonServices import json_reader
 from utils.displayUtils import clear_screen
+from art import tprint
 
 # On Windows, msvcrt allows you to read a key without waiting for Enter.
 try:
@@ -19,9 +20,8 @@ def memory_sequence_challenge(length: int = 4) -> str:
     """
     options = ["N", "S", "E", "W"]
     seq = [random.choice(options) for _ in range(length)]
-    display = " ".join(seq)
-    print("Memorize this sequence:")
-    print(display)
+    display = "  ".join(seq)
+    tprint(f"Memorize this sequence:\n{display}", "small")
     time.sleep(1)
     clear_screen()
     return "".join(seq)
